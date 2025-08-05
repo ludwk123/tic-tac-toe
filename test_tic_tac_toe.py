@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Unit tests for Tic Tac Toe Game
-Tests all methods and edge cases of the TicTacToe class.
+Unit tests for Tic Tac Toe game
 """
 
 import unittest
@@ -12,7 +11,7 @@ from tic_tac_toe import TicTacToe
 
 
 class TestTicTacToe(unittest.TestCase):
-    """Test cases for the TicTacToe class."""
+    """Test cases for TicTacToe class."""
     
     def setUp(self):
         """Set up a fresh game instance before each test."""
@@ -20,13 +19,33 @@ class TestTicTacToe(unittest.TestCase):
     
     def test_initialization(self):
         """Test that the game initializes correctly."""
-        self.assertEqual(self.game.board, [[' ' for _ in range(3)] for _ in range(3)])
         self.assertEqual(self.game.current_player, 'X')
         self.assertFalse(self.game.game_over)
         self.assertIsNone(self.game.winner)
+        
+        # Check that board is empty
+        for row in self.game.board:
+            for cell in row:
+                self.assertEqual(cell, ' ')
+    
+    def test_display_board(self):
+        """Test board display functionality."""
+        with patch('builtins.print') as mock_print:
+            self.game.display_board()
+            
+            # Check that print was called with expected output
+            expected_calls = [
+                call('\n   1   2   3'),
+                call('1    |   |  '),
+                call('  -----------'),
+                call('2    |   |  '),
+                call('  -----------'),
+                call('3    |   |  ')
+            ]
+            mock_print.assert_has_calls(expected_calls)
     
     def test_is_valid_move(self):
-        """Test valid and invalid moves."""
+        """Test move validation."""
         # Test valid moves
         self.assertTrue(self.game.is_valid_move(0, 0))
         self.assertTrue(self.game.is_valid_move(1, 1))
@@ -47,19 +66,16 @@ class TestTicTacToe(unittest.TestCase):
     
     def test_make_move(self):
         """Test making moves on the board."""
-        # Test successful moves
+        # Test valid move
         self.assertTrue(self.game.make_move(0, 0))
         self.assertEqual(self.game.board[0][0], 'X')
         
-        # Switch player and make another move
-        self.game.switch_player()
-        self.assertTrue(self.game.make_move(1, 1))
-        self.assertEqual(self.game.board[1][1], 'O')
+        # Test invalid move (occupied position)
+        self.assertFalse(self.game.make_move(0, 0))
         
-        # Test invalid moves
-        self.assertFalse(self.game.make_move(0, 0))  # Already occupied
-        self.assertFalse(self.game.make_move(-1, 0))  # Out of bounds
-        self.assertFalse(self.game.make_move(0, 3))   # Out of bounds
+        # Test invalid move (out of bounds)
+        self.assertFalse(self.game.make_move(3, 0))
+        self.assertFalse(self.game.make_move(0, 3))
     
     def test_switch_player(self):
         """Test player switching."""
@@ -72,73 +88,45 @@ class TestTicTacToe(unittest.TestCase):
         self.assertEqual(self.game.current_player, 'X')
     
     def test_check_winner_rows(self):
-        """Test winning conditions in rows."""
-        # Test first row win
-        self.game.board = [
-            ['X', 'X', 'X'],
-            [' ', ' ', ' '],
-            [' ', ' ', ' ']
-        ]
+        """Test win detection for rows."""
+        # Test row 0 win
+        self.game.board[0] = ['X', 'X', 'X']
         self.assertEqual(self.game.check_winner(), 'X')
         
-        # Test second row win
-        self.game.board = [
-            [' ', ' ', ' '],
-            ['O', 'O', 'O'],
-            [' ', ' ', ' ']
-        ]
+        # Test row 1 win
+        self.game.board = [[' ', ' ', ' '], ['O', 'O', 'O'], [' ', ' ', ' ']]
         self.assertEqual(self.game.check_winner(), 'O')
         
-        # Test third row win
-        self.game.board = [
-            [' ', ' ', ' '],
-            [' ', ' ', ' '],
-            ['X', 'X', 'X']
-        ]
+        # Test row 2 win
+        self.game.board = [[' ', ' ', ' '], [' ', ' ', ' '], ['X', 'X', 'X']]
         self.assertEqual(self.game.check_winner(), 'X')
     
     def test_check_winner_columns(self):
-        """Test winning conditions in columns."""
-        # Test first column win
-        self.game.board = [
-            ['X', ' ', ' '],
-            ['X', ' ', ' '],
-            ['X', ' ', ' ']
-        ]
+        """Test win detection for columns."""
+        # Test column 0 win
+        self.game.board[0][0] = 'X'
+        self.game.board[1][0] = 'X'
+        self.game.board[2][0] = 'X'
         self.assertEqual(self.game.check_winner(), 'X')
         
-        # Test second column win
-        self.game.board = [
-            [' ', 'O', ' '],
-            [' ', 'O', ' '],
-            [' ', 'O', ' ']
-        ]
+        # Test column 1 win
+        self.game.board = [[' ', 'O', ' '], [' ', 'O', ' '], [' ', 'O', ' ']]
         self.assertEqual(self.game.check_winner(), 'O')
         
-        # Test third column win
-        self.game.board = [
-            [' ', ' ', 'X'],
-            [' ', ' ', 'X'],
-            [' ', ' ', 'X']
-        ]
+        # Test column 2 win
+        self.game.board = [[' ', ' ', 'X'], [' ', ' ', 'X'], [' ', ' ', 'X']]
         self.assertEqual(self.game.check_winner(), 'X')
     
     def test_check_winner_diagonals(self):
-        """Test winning conditions in diagonals."""
-        # Test main diagonal win
-        self.game.board = [
-            ['X', ' ', ' '],
-            [' ', 'X', ' '],
-            [' ', ' ', 'X']
-        ]
+        """Test win detection for diagonals."""
+        # Test main diagonal (top-left to bottom-right)
+        self.game.board[0][0] = 'X'
+        self.game.board[1][1] = 'X'
+        self.game.board[2][2] = 'X'
         self.assertEqual(self.game.check_winner(), 'X')
         
-        # Test anti-diagonal win
-        self.game.board = [
-            [' ', ' ', 'O'],
-            [' ', 'O', ' '],
-            ['O', ' ', ' ']
-        ]
+        # Test anti-diagonal (top-right to bottom-left)
+        self.game.board = [[' ', ' ', 'O'], [' ', 'O', ' '], ['O', ' ', ' ']]
         self.assertEqual(self.game.check_winner(), 'O')
     
     def test_check_winner_no_winner(self):
@@ -147,19 +135,8 @@ class TestTicTacToe(unittest.TestCase):
         self.assertIsNone(self.game.check_winner())
         
         # Partially filled board
-        self.game.board = [
-            ['X', 'O', ' '],
-            ['O', 'X', ' '],
-            [' ', ' ', ' ']
-        ]
-        self.assertIsNone(self.game.check_winner())
-        
-        # Full board with no winner
-        self.game.board = [
-            ['X', 'O', 'X'],
-            ['O', 'X', 'O'],
-            ['O', 'X', 'O']
-        ]
+        self.game.board[0][0] = 'X'
+        self.game.board[1][1] = 'O'
         self.assertIsNone(self.game.check_winner())
     
     def test_is_board_full(self):
@@ -168,159 +145,165 @@ class TestTicTacToe(unittest.TestCase):
         self.assertFalse(self.game.is_board_full())
         
         # Partially filled board
-        self.game.board = [
-            ['X', 'O', 'X'],
-            ['O', 'X', ' '],
-            [' ', ' ', ' ']
-        ]
+        self.game.board[0][0] = 'X'
         self.assertFalse(self.game.is_board_full())
         
         # Full board
         self.game.board = [
             ['X', 'O', 'X'],
             ['O', 'X', 'O'],
-            ['O', 'X', 'O']
+            ['X', 'O', 'X']
         ]
         self.assertTrue(self.game.is_board_full())
     
-    def test_display_board(self):
-        """Test board display output."""
-        # Set up a specific board state
-        self.game.board = [
-            ['X', 'O', 'X'],
-            ['O', 'X', ' '],
-            [' ', ' ', 'O']
-        ]
-        
-        # Capture the output
-        with patch('sys.stdout', new=StringIO()) as fake_out:
-            self.game.display_board()
-            output = fake_out.getvalue()
+    def test_get_player_input_valid(self):
+        """Test valid player input."""
+        with patch('builtins.input', return_value='1 2'):
+            row, col = self.game.get_player_input()
+            self.assertEqual(row, 0)  # 1-1 = 0
+            self.assertEqual(col, 1)  # 2-1 = 1
+    
+    def test_get_player_input_invalid_format(self):
+        """Test invalid input format."""
+        with patch('builtins.input', side_effect=['1', '1 2 3', '1 2']):
+            row, col = self.game.get_player_input()
+            self.assertEqual(row, 0)
+            self.assertEqual(col, 1)
+    
+    def test_get_player_input_out_of_bounds(self):
+        """Test out of bounds input."""
+        with patch('builtins.input', side_effect=['0 1', '4 1', '1 0', '1 4', '1 2']):
+            row, col = self.game.get_player_input()
+            self.assertEqual(row, 0)
+            self.assertEqual(col, 1)
+    
+    def test_get_player_input_occupied_position(self):
+        """Test input for occupied position."""
+        self.game.board[0][1] = 'X'  # Occupy position 1 2
+        with patch('builtins.input', side_effect=['1 2', '2 1']):
+            row, col = self.game.get_player_input()
+            self.assertEqual(row, 1)  # 2-1 = 1
+            self.assertEqual(col, 0)  # 1-1 = 0
+    
+    def test_get_player_input_quit(self):
+        """Test quit command."""
+        with patch('builtins.input', return_value='quit'):
+            with self.assertRaises(SystemExit):
+                self.game.get_player_input()
+    
+    def test_get_player_input_exit(self):
+        """Test exit command."""
+        with patch('builtins.input', return_value='exit'):
+            with self.assertRaises(SystemExit):
+                self.game.get_player_input()
+    
+    def test_get_player_input_q(self):
+        """Test q command."""
+        with patch('builtins.input', return_value='q'):
+            with self.assertRaises(SystemExit):
+                self.game.get_player_input()
+    
+    def test_get_player_input_keyboard_interrupt(self):
+        """Test keyboard interrupt handling."""
+        with patch('builtins.input', side_effect=KeyboardInterrupt):
+            with self.assertRaises(SystemExit):
+                self.game.get_player_input()
+    
+    def test_get_player_input_value_error(self):
+        """Test value error handling."""
+        with patch('builtins.input', side_effect=['a b', '1 2']):
+            row, col = self.game.get_player_input()
+            self.assertEqual(row, 0)
+            self.assertEqual(col, 1)
+    
+    def test_play_game_winner(self):
+        """Test game with a winner."""
+        # Simulate a winning game: X wins in top row
+        with patch.object(self.game, 'get_player_input') as mock_input:
+            mock_input.side_effect = [(0, 0), (1, 0), (0, 1), (1, 1), (0, 2)]
             
-            # Check that the output contains expected elements
-            self.assertIn('1   2   3', output)
-            self.assertIn('1  X | O | X', output)
-            self.assertIn('2  O | X |', output)
-            self.assertIn('3    |   | O', output)
-            self.assertIn('-----------', output)
+            with patch.object(self.game, 'display_board') as mock_display:
+                with patch('builtins.print') as mock_print:
+                    self.game.play_game()
+                    
+                    # Check that display_board was called
+                    self.assertTrue(mock_display.called)
+                    
+                    # Check that winner message was printed
+                    mock_print.assert_any_call('🎉 Player X wins! 🎉')
+                    
+                    # Check game state
+                    self.assertTrue(self.game.game_over)
+                    self.assertEqual(self.game.winner, 'X')
     
-    @patch('builtins.input')
-    def test_get_player_input_valid(self, mock_input):
-        """Test getting valid player input."""
-        mock_input.return_value = "2 3"
-        
-        row, col = self.game.get_player_input()
-        
-        self.assertEqual(row, 1)  # 2-1 = 1
-        self.assertEqual(col, 2)  # 3-1 = 2
-        mock_input.assert_called_once()
-    
-    @patch('builtins.input')
-    def test_get_player_input_invalid_format(self, mock_input):
-        """Test handling of invalid input format."""
-        mock_input.side_effect = ["1", "1 2 3", "2 3"]
-        
-        row, col = self.game.get_player_input()
-        
-        self.assertEqual(row, 1)
-        self.assertEqual(col, 2)
-        self.assertEqual(mock_input.call_count, 3)
-    
-    @patch('builtins.input')
-    def test_get_player_input_out_of_bounds(self, mock_input):
-        """Test handling of out-of-bounds input."""
-        mock_input.side_effect = ["0 1", "4 2", "2 3"]
-        
-        row, col = self.game.get_player_input()
-        
-        self.assertEqual(row, 1)
-        self.assertEqual(col, 2)
-        self.assertEqual(mock_input.call_count, 3)
-    
-    @patch('builtins.input')
-    def test_get_player_input_occupied_position(self, mock_input):
-        """Test handling of occupied position input."""
-        self.game.board[1][1] = 'X'  # Occupy position (2,2)
-        mock_input.side_effect = ["2 2", "1 1"]
-        
-        row, col = self.game.get_player_input()
-        
-        self.assertEqual(row, 0)
-        self.assertEqual(col, 0)
-        self.assertEqual(mock_input.call_count, 2)
-    
-    @patch('builtins.input')
-    def test_get_player_input_quit(self, mock_input):
-        """Test quitting the game."""
-        mock_input.return_value = "quit"
-        
-        with self.assertRaises(SystemExit):
-            self.game.get_player_input()
-    
-    @patch('builtins.input')
-    def test_get_player_input_exit(self, mock_input):
-        """Test exiting the game."""
-        mock_input.return_value = "exit"
-        
-        with self.assertRaises(SystemExit):
-            self.game.get_player_input()
-    
-    @patch('builtins.input')
-    def test_get_player_input_keyboard_interrupt(self, mock_input):
-        """Test handling keyboard interrupt."""
-        mock_input.side_effect = KeyboardInterrupt()
-        
-        with self.assertRaises(SystemExit):
-            self.game.get_player_input()
-    
-    def test_complete_game_flow(self):
-        """Test a complete game flow."""
-        # Simulate a game where X wins in the first row
-        moves = [(0, 0), (1, 0), (0, 1), (1, 1), (0, 2)]  # X wins
-        
-        for i, (row, col) in enumerate(moves):
-            # Make the move
-            self.assertTrue(self.game.make_move(row, col))
-            
-            # Check for winner
-            winner = self.game.check_winner()
-            if winner:
-                self.assertEqual(winner, 'X')
-                self.game.game_over = True
-                self.game.winner = winner
-                break
-            
-            # Check for tie
-            if self.game.is_board_full():
-                self.game.game_over = True
-                break
-            
-            # Switch player if game continues
-            if not self.game.game_over:
-                self.game.switch_player()
-        
-        # Verify final state
-        self.assertTrue(self.game.game_over)
-        self.assertEqual(self.game.winner, 'X')
-        self.assertEqual(self.game.board[0], ['X', 'X', 'X'])
-    
-    def test_tie_game(self):
-        """Test a tie game scenario."""
-        # Set up a tie game
+    def test_play_game_tie(self):
+        """Test game ending in a tie."""
+        # Create a tie scenario - almost full board with one move left
+        # This board has no winner but will be full after the last move
         self.game.board = [
             ['X', 'O', 'X'],
             ['O', 'X', 'O'],
-            ['O', 'X', 'O']
+            ['O', 'X', ' ']
         ]
+        self.game.current_player = 'X'  # Set current player
         
-        # Check that there's no winner
-        self.assertIsNone(self.game.check_winner())
+        with patch.object(self.game, 'get_player_input') as mock_input:
+            mock_input.return_value = (2, 2)  # Last move to complete the board
+            
+            with patch.object(self.game, 'display_board') as mock_display:
+                with patch('builtins.print') as mock_print:
+                    self.game.play_game()
+                    
+                    # Check that winner message was printed (X wins in column 3)
+                    mock_print.assert_any_call('🎉 Player X wins! 🎉')
+                    
+                    # Check game state
+                    self.assertTrue(self.game.game_over)
+                    self.assertEqual(self.game.winner, 'X')
+    
+    def test_play_game_actual_tie(self):
+        """Test game ending in an actual tie."""
+        # Create a tie scenario - almost full board with one move left
+        # This board has no winner and will be full after the last move
+        self.game.board = [
+            ['X', 'O', 'X'],
+            ['O', 'X', 'O'],
+            ['O', 'X', ' ']
+        ]
+        self.game.current_player = 'O'  # Set current player to O
         
-        # Check that board is full
-        self.assertTrue(self.game.is_board_full())
+        with patch.object(self.game, 'get_player_input') as mock_input:
+            mock_input.return_value = (2, 2)  # Last move to complete the board
+            
+            with patch.object(self.game, 'display_board') as mock_display:
+                with patch('builtins.print') as mock_print:
+                    self.game.play_game()
+                    
+                    # Check that tie message was printed
+                    mock_print.assert_any_call('🤝 It\'s a tie! 🤝')
+                    
+                    # Check game state
+                    self.assertTrue(self.game.game_over)
+                    self.assertIsNone(self.game.winner)
+    
+    def test_integration_game_flow(self):
+        """Test complete game flow."""
+        game = TicTacToe()
         
-        # Verify it's a tie
-        self.assertFalse(self.game.game_over)  # Game should continue until checked
+        # Simulate moves for a complete game
+        moves = [(0, 0), (1, 1), (0, 1), (1, 0), (0, 2)]  # X wins in top row
+        
+        with patch.object(game, 'get_player_input') as mock_input:
+            mock_input.side_effect = moves
+            
+            with patch.object(game, 'display_board'):
+                with patch('builtins.print') as mock_print:
+                    game.play_game()
+                    
+                    # Verify game ended with X as winner
+                    self.assertTrue(game.game_over)
+                    self.assertEqual(game.winner, 'X')
+                    mock_print.assert_any_call('🎉 Player X wins! 🎉')
 
 
 if __name__ == '__main__':

@@ -5,108 +5,86 @@ This directory contains comprehensive unit tests for the Tic Tac Toe game implem
 ## Test Files
 
 - `test_tic_tac_toe.py` - Main test suite for the TicTacToe class
-- `run_tests.py` - Test runner script with a nice interface
+- `run_tests.py` - Test runner script
 
 ## Running Tests
 
-### Option 1: Using the test runner (recommended)
+### Using the test runner script:
 ```bash
 python run_tests.py
 ```
 
-### Option 2: Using unittest directly
+### Using unittest directly:
 ```bash
 python -m unittest test_tic_tac_toe.py -v
 ```
 
-### Option 3: Running individual test methods
+### Using pytest (if installed):
 ```bash
-python -m unittest test_tic_tac_toe.TestTicTacToe.test_initialization -v
+python -m pytest test_tic_tac_toe.py -v
 ```
 
 ## Test Coverage
 
-The test suite covers all major functionality of the TicTacToe class:
+The test suite covers the following functionality:
 
 ### Core Game Logic
-- ✅ **Initialization** - Tests proper game state setup
-- ✅ **Valid/Invalid Moves** - Tests move validation (bounds, occupied positions)
-- ✅ **Making Moves** - Tests successful and failed move attempts
-- ✅ **Player Switching** - Tests alternating between X and O players
+- **Initialization**: Tests proper game setup with empty board and correct initial state
+- **Move Validation**: Tests valid and invalid moves (out of bounds, occupied positions)
+- **Move Execution**: Tests making moves and updating the board
+- **Player Switching**: Tests alternating between X and O players
 
 ### Win Detection
-- ✅ **Row Wins** - Tests all three rows for winning combinations
-- ✅ **Column Wins** - Tests all three columns for winning combinations
-- ✅ **Diagonal Wins** - Tests both main and anti-diagonals
-- ✅ **No Winner** - Tests scenarios with no winning condition
+- **Row Wins**: Tests all three rows for winning combinations
+- **Column Wins**: Tests all three columns for winning combinations  
+- **Diagonal Wins**: Tests both main diagonal and anti-diagonal
+- **No Winner**: Tests scenarios with no winning combination
 
 ### Game State
-- ✅ **Board Full Detection** - Tests tie game scenarios
-- ✅ **Complete Game Flow** - Tests a full game from start to win
-- ✅ **Tie Game** - Tests scenarios where the board fills without a winner
+- **Board Full Detection**: Tests when the board is completely filled
+- **Game Over Conditions**: Tests both win and tie scenarios
 
-### User Interface
-- ✅ **Board Display** - Tests the visual output of the game board
-- ✅ **Player Input Validation** - Tests various input scenarios:
-  - Valid input format
-  - Invalid format (wrong number of values)
-  - Out-of-bounds values
-  - Occupied positions
-  - Quit/exit commands
-  - Keyboard interrupts
+### User Input Handling
+- **Valid Input**: Tests proper parsing of valid move input
+- **Invalid Format**: Tests handling of malformed input
+- **Out of Bounds**: Tests input validation for board boundaries
+- **Occupied Positions**: Tests handling of moves to already taken positions
+- **Quit Commands**: Tests exit functionality ('quit', 'exit', 'q')
+- **Error Handling**: Tests keyboard interrupts and value errors
 
-## Test Statistics
-
-- **Total Tests**: 19
-- **Test Categories**: 8
-- **Coverage**: All public methods of TicTacToe class
-- **Edge Cases**: Comprehensive coverage of error conditions
+### Game Flow
+- **Complete Game with Winner**: Tests full game flow ending in a win
+- **Complete Game with Tie**: Tests full game flow ending in a tie
+- **Integration**: Tests complete game scenarios with multiple moves
 
 ## Test Structure
 
-Each test method follows a clear pattern:
-1. **Setup** - Prepare test data and game state
-2. **Action** - Execute the method being tested
-3. **Assertion** - Verify expected outcomes
+Each test method follows the Arrange-Act-Assert pattern:
+1. **Arrange**: Set up the test conditions (board state, player turn, etc.)
+2. **Act**: Execute the method being tested
+3. **Assert**: Verify the expected outcomes
 
 ## Mocking
 
 The tests use Python's `unittest.mock` to:
-- Mock user input for testing the `get_player_input()` method
-- Capture stdout to test the `display_board()` method
-- Handle system exits for quit/exit scenarios
+- Mock user input to test different scenarios
+- Mock print statements to verify output messages
+- Mock method calls to isolate specific functionality
 
-## Example Test Output
+## Test Data
 
-```
-🧪 Running Tic Tac Toe Unit Tests 🧪
-==================================================
-test_initialization (test_tic_tac_toe.TestTicTacToe)
-Test that the game initializes correctly. ... ok
-test_is_valid_move (test_tic_tac_toe.TestTicTacToe)
-Test valid and invalid moves. ... ok
-...
-----------------------------------------------------------------------
-Ran 19 tests in 0.005s
+The tests include various board configurations to test:
+- Empty boards
+- Partially filled boards
+- Winning combinations
+- Tie scenarios
+- Edge cases
 
-OK
-==================================================
-✅ All tests passed! ✅
+## Continuous Integration
+
+These tests can be easily integrated into CI/CD pipelines by running:
+```bash
+python run_tests.py
 ```
 
-## Adding New Tests
-
-To add new tests:
-
-1. Add test methods to the `TestTicTacToe` class in `test_tic_tac_toe.py`
-2. Follow the naming convention: `test_<method_name>_<scenario>`
-3. Include docstrings explaining what the test covers
-4. Run the test suite to ensure all tests pass
-
-## Best Practices
-
-- Each test should be independent and not rely on other tests
-- Use descriptive test names that explain the scenario being tested
-- Test both valid and invalid inputs
-- Test edge cases and error conditions
-- Keep tests focused on a single piece of functionality 
+The script exits with code 0 on success and non-zero on failure, making it suitable for automated testing. 
